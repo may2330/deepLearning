@@ -7,11 +7,13 @@
 
 ## Note MarkDown
 강조 : **강조**
+
 참고 : [네이버](http://naver.com/)
+
 표   
-|                |과일                        |계절       |
-|----------------|----------------------------|-----------|
-|singlr backticks|'apple'                     |'봄'       |
-|Quotes          |"apple"                     |"봄"       |
-|Dashes          |--is en-dash, --- is em-dash|--봄, ---봄|
+|                |fruit                       |season             |
+|----------------|----------------------------|-------------------|
+|singlr backticks|'apple'                     |'spring'           |
+|Quotes          |"apple"                     |"spring"           |
+|Dashes          |--is en-dash, --- is em-dash|--spring, ---spring|
 
