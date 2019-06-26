@@ -46,16 +46,16 @@
   [네이버](http://naver.com/)
 
 -표   
-|좌측정렬 |가운데정렬 |우측정렬             |
-|:---|:---:|---"|
-|singlr backticks|'apple'                     |'spring'           |
-|Quotes          |"apple"                     |"spring"           |
-|Dashes          |--is en-dash, --- is em-dash|--spring, ---spring|
+|좌측정렬            |가운데정렬                           |우측정렬                |
+|:---------------------|:------------------------------------:|------------------------:|
+|singlr backticks|'apple'                                   |'spring'                  |
+|Quotes              |"apple"                                  |"spring"                 |
+|Dashes              |--is en-dash, --- is em-dash|--spring, ---spring|
 
 - 체크박스
-
-  - [] 노체크
-  - [x] 체크
+- [ ] 체크박스
+- [x] 체크박스
+- [x] 체크박스
 
 - 다이어그램
 ```mermaid
