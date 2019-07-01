@@ -1,7 +1,7 @@
 import cv2
 
 
-imageFile = './data/lena.jpg'
+imageFile = '/home/seulgi/data/lena.jpg'
 
 img = cv2.imread(imageFile)
 img2 = cv2.imread(imageFile,0)
