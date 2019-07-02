@@ -5,17 +5,19 @@ from matplotlib import pyplot as plt
 img = cv2.imread('/home/seulgi/data/color.jpg',cv2.IMREAD_COLOR)
 
 # BGR -> HSV 모드로 전환
+# H 가 일정한 범위를 갖는 순수한 색 정보를 가지고 있기 때문에
+# RGB 이미지보다 쉽게 색을 분류할수 있음
 hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
 # HSV에서 BGR로 가정할 범위를 정의함
-lower_blue = np.array([110,100,100])
-upper_blue = np.array([130,255,255])
+lower_blue = np.array([110,0,0]) # 110 100 100
+upper_blue = np.array([130,255,255]) # 130 255 255
 
-lower_green = np.array([50,100,100])
-upper_green = np.array([70,255,255])
+lower_green = np.array([45,0,0]) # 50 100 100
+upper_green = np.array([75,255,255]) # 70 255 255
 
-lower_red = np.array([-10,100,100])
-upper_red = np.array([10,255,255])
+lower_red = np.array([160,0,0]) # -10 100 100 
+upper_red = np.array([180,255,255]) # 10 255 255
 
 # HSV 이미지에서 청색만, 또는 초록색만, 또는 빨간색만 추출하기 위한 임계값
 mask_blue = cv2.inRange(hsv, lower_blue, upper_blue)
