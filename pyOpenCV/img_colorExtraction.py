@@ -4,6 +4,10 @@ from matplotlib import pyplot as plt
 
 img = cv2.imread('/home/seulgi/data/color.jpg',cv2.IMREAD_COLOR)
 
+# img blur
+#img = cv2.GaussianBlur(img, (5,5), 0)
+img = cv2.bilateralFilter(img,9,75,75) # 에지를 보존하면서 노이즈를 감소
+
 # BGR -> HSV 모드로 전환
 # H 가 일정한 범위를 갖는 순수한 색 정보를 가지고 있기 때문에
 # RGB 이미지보다 쉽게 색을 분류할수 있음
@@ -16,13 +20,16 @@ upper_blue = np.array([130,255,255]) # 130 255 255
 lower_green = np.array([45,0,0]) # 50 100 100
 upper_green = np.array([75,255,255]) # 70 255 255
 
-lower_red = np.array([160,0,0]) # -10 100 100 
-upper_red = np.array([180,255,255]) # 10 255 255
+#lower_red = np.array([-50,0,0]) # -10 100 100 
+#upper_red = np.array([5,255,255]) # 10 255 255
+
+lower_red = cv2.inRange(hsv, (0,0,0), (6,255,255))
+upper_red = cv2.inRange(hsv, (170,0,0), (180,255,255))
 
 # HSV 이미지에서 청색만, 또는 초록색만, 또는 빨간색만 추출하기 위한 임계값
 mask_blue = cv2.inRange(hsv, lower_blue, upper_blue)
 mask_green = cv2.inRange(hsv, lower_green, upper_green)
-mask_red = cv2.inRange(hsv, lower_red, upper_red)
+mask_red = cv2.addWeighted(lower_red, 1.0, upper_red, 1.0,0.0)
 
 # mask와 원본 이미지를 비트 연산함
 res1 = cv2.bitwise_and(img, img, mask=mask_blue)
