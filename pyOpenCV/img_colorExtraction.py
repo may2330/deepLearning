@@ -32,12 +32,18 @@ res3 = cv2.bitwise_and(img, img, mask=mask_red)
 #cv2.imshow('green', res2)
 #cv2.imshow('red', res3)
 
+# BGR -> RGB
+imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+res1 = cv2.cvtColor(res1, cv2.COLOR_BGR2RGB)
+res2 = cv2.cvtColor(res2, cv2.COLOR_BGR2RGB)
+res3 = cv2.cvtColor(res3, cv2.COLOR_BGR2RGB)
+
 # subplots 2x2
 fig, ax = plt.subplots(2, 2, figsize=(10,10), sharey=True)
 fig.canvas.set_window_title('Sample Pictures')
 
 ax[0][0].axis('off')
-ax[0][0].imshow(img, aspect = 'auto')
+ax[0][0].imshow(imgRGB, aspect = 'auto')
 
 ax[0][1].axis('off')
 ax[0][1].imshow(res1, aspect = 'auto')
