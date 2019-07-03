@@ -3,35 +3,127 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h> // mkdir()
+#include <sys/types.h>
 #include <unistd.h>
+#include <sys/statfs.h>
+#include <dirent.h>
+
 
 #define size 100
+#define PATH "/home/seulgi/blackbox/"
 
+void makePathDir();
 void makeTimeDir(char *name);
 int makeDir(char *name, char *path);
 void makeTimeFile(char *file_name);
 void makeFile(char *path, char *file_name);
+int checkSize(char *path);
+void delFirstDir();
+void delDir(char *dir_name);
 
 void main(){
     char dir_name[size], path[size], file_name[size];
-    int result;
+    int result, check_del;
 
     makeTimeDir(dir_name);
-    result = makeDir(dir_name, path);
+    result = makeDir(dir_name,path);
+    if(result==-1){
+        printf("디렉토리 안만들어졌다!!!!!!!!!!!!!!1\n");
+        exit(0);
+    }
+    
     makeTimeFile(file_name);
     makeFile(path,file_name);
+    check_del = checkSize(path);
+    if(check_del==0)
+        delFirstDir();
+}
+
+void delDir(char *dir_name){
+    char dir[size], del_filename[size];
+    DIR *dir_ptr = NULL;
+    struct dirent *file = NULL;
+
+    strcpy(dir, PATH);
+    strcat(dir, dir_name);
+
+    if(rmdir(dir)==-1){
+        printf("가장 오래된 파일 삭제 No...안에 파일존재함 !!!\n");
+        if((dir_ptr = opendir(dir)) == NULL){
+            printf("지울 디렉토리의 파일을 읽을 수 없음...\n");
+            exit(1);
+        }
+
+        while((file=readdir(dir_ptr)) !=NULL){
+            strcpy(del_filename,dir);
+            strcat(del_filename,"/");
+            strcat(del_filename, file->d_name);
+            if(remove(del_filename)==0)
+                printf("파일 삭제 성공\n");
+        }
+
+        if(rmdir(dir)==0)
+            printf("======================= %s 디렉토리 삭제 \n\n",dir);
+    }
+}
+
+void delFirstDir(){
+    struct dirent **namelist;
+    int count=0,idx=0;
+    char dir_name[size];
+
+    if((count = scandir(PATH, &namelist, NULL, alphasort))==-1){
+        printf("Error\n");
+        exit(1);
+    }
+
+    strcpy(dir_name, namelist[2]->d_name);
+
+    for(idx=0;idx<count;idx++)
+        free(namelist[idx]);
+
+    free(namelist);
+
+    delDir(dir_name);
+}
+
+int checkSize(char *path){
+    struct statfs fs;
+    size_t diskSize=0, freeSize=0;
+    int result=0;
+    float percent;
+
+    if (statfs(path, &fs) != 0 ){
+        printf("%s 파일 사이즈 없음! 헐....\n",path);
+        exit(0);
+    }
+    
+    diskSize = fs.f_blocks * (fs.f_bsize/1024); // printf 에서 %lu
+    freeSize = fs.f_bfree * (fs.f_bsize/1024);
+
+    percent = ((float)freeSize/diskSize)*100;
+    if(percent > 10)
+        result = 1;
+    
+    return result;
 }
 
 void makeFile(char *path, char *file_name){
     FILE *fp;
-    char full[size];
+    char p[size];
 
-    strcpy(full,path);
-    strcat(full,"/");
-    strcat(full,file_name);
-    printf("%s",full);
-    fp = fopen(full, "w");
-    fclose(fp);
+    strcpy(p,path);
+    strcat(p,"/");
+    strcat(p,file_name);
+
+    if(access(p,F_OK)==0)
+        printf("현재 시간 파일 있어영~ \n");
+    
+    else{
+        fp = fopen(p, "w");
+        fclose(fp);
+        printf("파일 만들었음!\n");
+    }
 }
 
 void makeTimeFile(char *file_name){
@@ -42,7 +134,6 @@ void makeTimeFile(char *file_name){
     t = localtime(&timer); // 초 단위의 시간을 분리하여 구조체에 넣기
 
     strftime(file_name,20,"%Y%m%d_%H%M%S",t);
-    printf("%s\n",file_name);
 }
 
 void makeTimeDir(char *dir_name){
@@ -52,27 +143,24 @@ void makeTimeDir(char *dir_name){
     timer = time(NULL); // 현재 시각을 초 단위로 얻기
     t = localtime(&timer); // 초 단위의 시간을 분리하여 구조체에 넣기
 
-    // printf("%d 년",t->tm_year+1900);
-    // printf("%d 월",t->tm_mon+1);
-    // printf("%d 일",t->tm_mday);
-    // printf("%d 시",t->tm_hour);
-    // printf("%d 분",t->tm_min);
-    // printf("%d 초",t->tm_sec);
-   
-    // sprintf(name,"%d%d%d_%d",t->tm_year,t->tm_mon,t->tm_mday,t->tm_hour);
-
     strftime(dir_name,20,"%Y%m%d_%H",t);
-    // printf("%s\n",dir_name);
 }
 
 int makeDir(char *name, char *path){
-    char p[size] ="/home/seulgi/blackbox/"; 
-    
+    char p[size] =""; 
+    int result;
+
+    strcpy(p,PATH);
     strcat(p,name);
     strcpy(path,p);
-    // printf("%s\n",ptr);
 
-    int result = mkdir(p,0755);
-    // printf("%d",result);
-    return result;
+    // 같은이름의 디렉토리 있는지 여부 확인
+    if(access(p,F_OK)==0){
+        printf("현재 시간 디렉토리 있어영~ \n");
+        return 0;
+    }
+    
+    return mkdir(p,0755);
 }
+
+
