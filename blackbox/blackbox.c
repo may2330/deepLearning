@@ -24,19 +24,26 @@ void delDir(char *dir_name);
 void main(){
     char dir_name[size], path[size], file_name[size];
     int result, check_del;
-
-    makeTimeDir(dir_name);
-    result = makeDir(dir_name,path);
-    if(result==-1){
-        printf("디렉토리 안만들어졌다!!!!!!!!!!!!!!1\n");
-        exit(0);
+    int count = 0;
+    while(count<2){
+        makeTimeDir(dir_name);
+        result = makeDir(dir_name,path);
+        if(result==-1){
+            printf("디렉토리 안만들어졌다!!!!!!!!!!!!!!1\n");
+            exit(0);
+        }
+        check_del = checkSize(path);
+        if(check_del==0){
+            printf("파일 지워야함\n");
+            delFirstDir();
+        }
+        else{
+            printf("파일 안지워도댐\n");
+            makeTimeFile(file_name);
+            makeFile(path,file_name);
+        }
+        count++;
     }
-    
-    makeTimeFile(file_name);
-    makeFile(path,file_name);
-    check_del = checkSize(path);
-    if(check_del==0)
-        delFirstDir();
 }
 
 void delDir(char *dir_name){
