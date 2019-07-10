@@ -1,3 +1,4 @@
+#include <pthread.h>
 #include <stdio.h>
 #include <time.h>
 #include <stdlib.h>
@@ -7,43 +8,113 @@
 #include <unistd.h>
 #include <sys/statfs.h>
 #include <dirent.h>
-
+#include <time.h>
+#include <sys/time.h> // getimeofday( ) 함수에서 사용
 
 #define size 100
 #define PATH "/home/seulgi/blackbox/"
+#define STEP 5 // 5 초마다 동영상 저장 (쓰레드 실행)
 
 void makePathDir();
 void makeTimeDir(char *name);
 int makeDir(char *name, char *path);
 void makeTimeFile(char *file_name);
 void makeFile(char *path, char *file_name);
-int checkSize(char *path);
+int checkSize();
 void delFirstDir();
 void delDir(char *dir_name);
+void *d_function();
+void *m_function(void *data);
+int disp_runtime(struct timeval UTCtime_s, struct timeval UTCtime_e);
+
+
 
 void main(){
-    char dir_name[size], path[size], file_name[size];
-    int result, check_del;
-    int count = 0;
-    while(count<2){
-        makeTimeDir(dir_name);
-        result = makeDir(dir_name,path);
-        if(result==-1){
-            printf("디렉토리 안만들어졌다!!!!!!!!!!!!!!1\n");
-            exit(0);
-        }
-        check_del = checkSize(path);
-        if(check_del==0){
-            printf("파일 지워야함\n");
-            delFirstDir();
-        }
-        else{
-            printf("파일 안지워도댐\n");
-            makeTimeFile(file_name);
-            makeFile(path,file_name);
-        }
-        count++;
+
+    // 쓰레드 
+    pthread_t p_thread;
+    pthread_t m_th1, m_th2;
+    int flag=0;   
+    char c_th1[] = "thread_1"; 
+    char c_th2[] = "thread_2";
+
+    // 시작 시간
+    struct timeval UTCtime_s, UTCtime_e, UTCtime_r;
+    int gap; 
+    gettimeofday(&UTCtime_s, NULL);
+
+    // 쓰레드 생성
+    if(pthread_create(&p_thread, NULL, d_function, NULL))
+	    printf("Thread Error : No Make \n");
+
+    while(1){
+            gettimeofday(&UTCtime_e, NULL);
+            gap = disp_runtime(UTCtime_s, UTCtime_e) % STEP;
+	    
+	    if(gap==0 && flag==0){
+		flag = 1;
+	    	if(pthread_create(&m_th1, NULL, m_function, (void *)c_th1))
+			printf("M-Thread Error : No Make \n");
+	        pthread_detach(m_th1);
+	    }
+	    
+	    else if(gap==0){
+		flag = 0;
+	    	if(pthread_create(&m_th2, NULL, m_function, (void*)c_th2))
+			printf("M-Thread Error : No Make \n");
+	    	pthread_detach(m_th2);
+	    }
+
+	    sleep(1);
     }
+    // thread detach 
+    pthread_detach(p_thread);
+
+}
+
+int disp_runtime(struct timeval UTCtime_s, struct timeval UTCtime_e)
+{
+        struct timeval UTCtime_r;
+        if((UTCtime_e.tv_usec- UTCtime_s.tv_usec)<0)
+                UTCtime_r.tv_sec  = UTCtime_e.tv_sec - UTCtime_s.tv_sec - 1;
+        else
+                UTCtime_r.tv_sec = UTCtime_e.tv_sec - UTCtime_s.tv_sec;
+        printf("runtime : %ld sec\n", UTCtime_r.tv_sec);
+	return (int)UTCtime_r.tv_sec;
+}
+
+
+void *m_function(void *data){
+        char *thread_name = (char *)data;
+	char dir_name[size], path[size], file_name[size];
+        int result, check_del;
+
+	printf("\n[%s]====================\n",thread_name);
+	makeTimeDir(dir_name);
+	result = makeDir(dir_name,path);
+	if(result==-1){
+		printf("디렉토리 안만들어졌다!!!!!!!!!!!!!!1\n");
+		exit(0);
+	}
+
+	makeTimeFile(file_name);
+	makeFile(path,file_name);
+	
+	printf("\n\n");
+}
+
+void *d_function(){
+	int check_del;
+	
+	while(1){
+		check_del = checkSize();
+		if(check_del==0){
+			printf("--용량 꽉참--\n");
+			delFirstDir();
+		}
+		printf("--용량 체크 완료--\n");
+		sleep(4);
+	}
 }
 
 void delDir(char *dir_name){
@@ -94,14 +165,14 @@ void delFirstDir(){
     delDir(dir_name);
 }
 
-int checkSize(char *path){
+int checkSize(){
     struct statfs fs;
     size_t diskSize=0, freeSize=0;
     int result=0;
     float percent;
 
-    if (statfs(path, &fs) != 0 ){
-        printf("%s 파일 사이즈 없음! 헐....\n",path);
+    if (statfs(PATH, &fs) != 0 ){
+        printf("%s 파일 사이즈 없음! 헐....\n",PATH);
         exit(0);
     }
     
@@ -109,7 +180,9 @@ int checkSize(char *path){
     freeSize = fs.f_bfree * (fs.f_bsize/1024);
 
     percent = ((float)freeSize/diskSize)*100;
-    if(percent > 10)
+
+    // 남은 용량이 20% 이하이면 삭제
+    if(percent > 20)
         result = 1;
     
     return result;
