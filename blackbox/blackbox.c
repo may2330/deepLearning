@@ -12,8 +12,7 @@
 #include <sys/time.h> // getimeofday( ) 함수에서 사용
 
 #define size 100
-#define PATH "/home/seulgi/blackbox/"
-#define STEP 5 // 5 초마다 동영상 저장 (쓰레드 실행)
+#define PATH "/home/js/blackbox/"
 
 void makePathDir();
 void makeTimeDir(char *name);
@@ -37,10 +36,10 @@ void main(){
     int flag=0;   
     char c_th1[] = "thread_1"; 
     char c_th2[] = "thread_2";
+    struct timeval UTCtime_s, UTCtime_e, UTCtime_r;
 
     // 시작 시간
-    struct timeval UTCtime_s, UTCtime_e, UTCtime_r;
-    int gap; 
+    int gap, step = 10; // 10 초마다 동영상 저장
     gettimeofday(&UTCtime_s, NULL);
 
     // 쓰레드 생성
@@ -49,7 +48,7 @@ void main(){
 
     while(1){
             gettimeofday(&UTCtime_e, NULL);
-            gap = disp_runtime(UTCtime_s, UTCtime_e) % STEP;
+            gap = disp_runtime(UTCtime_s, UTCtime_e) % step;
 	    
 	    if(gap==0 && flag==0){
 		flag = 1;
