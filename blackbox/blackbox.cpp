@@ -43,10 +43,12 @@ std::string get_tegra_pipeline(int width, int height, int fps) {
 using namespace cv;
 using namespace std;
 
+// 시스템 종료
+int FLAG=0;
 
 // camera
-int WIDTH = 800;
-int HEIGHT = 500;
+int WIDTH = 720;
+int HEIGHT = 480;
 int FPS = 30;
 
 // Define the gstream pipeline
@@ -69,31 +71,31 @@ int main(void){
 
     // 시작 시간
     struct timeval UTCtime_s, UTCtime_e;
-    int gap, step = 10; // 10 초마다 동영상 저장
+    int gap;
     gettimeofday(&UTCtime_s, NULL);
 
     // 쓰레드 생성
     if(pthread_create(&p_thread, NULL, d_function, (void *)0))
 	    printf("Thread Error : No Make \n");
 
-    while(1){
+    while(!FLAG){
             gettimeofday(&UTCtime_e, NULL);
             gap = disp_runtime(UTCtime_s, UTCtime_e) % STEP;
-	    printf("gap : %d\n",gap);
+	    printf(" gap : %d\n",gap);
 	    if(gap==0 && flag==0){
-		flag = 1;
+//		flag = 1;
 	    	if(pthread_create(&m_th1, NULL, m_function, (void *)p1))
 			printf("M-Thread Error : No Make \n");
 	        pthread_detach(m_th1);
 	    }
-	    
+/*	    
 	    else if(gap==0){
 		flag = 0;
 	    	if(pthread_create(&m_th2, NULL, m_function, (void *)p2))
 			printf("M-Thread Error : No Make \n");
 	    	pthread_detach(m_th2);
 	    }
-
+*/
 	    sleep(1);
     }
     // thread detach 
@@ -118,7 +120,7 @@ void *m_function(void *data){
 	char dir_name[SIZE], path[SIZE], file_name[SIZE];
         int result, check_del;
 
-	printf("\n[%s]====================\n",thread_name);
+	printf("\n\n\n[%s]====================\n",thread_name);
 	makeTimeDir(dir_name);
 	result = makeDir(dir_name,path);
 	if(result==-1){
@@ -209,8 +211,9 @@ int checkSize(){
     freeSize = fs.f_bfree * (fs.f_bsize/1024);
 
     percent = ((float)freeSize/diskSize)*100;
+    printf("    percent : %f \n",percent);
 
-    // 남은 용량이 20% 이하이면 삭제
+    // 남은 용량이 30% 이하이면 삭제
     if(percent > 30)
         result = 1;
     
@@ -235,13 +238,15 @@ void makeFile(char *path, char *file_name){
 
         VideoWriter writer;
         double fps = 30.0;
-        writer.open(p, VideoWriter::fourcc('M', 'J', 'P', 'G'), fps, size, true);
+        writer.open(p, VideoWriter::fourcc('D', 'I', 'V', 'X'), fps, size, true);
         if (!writer.isOpened())
                 cout << "동영상을 저장하기 위한 초기화 작업 중 에러 발생" << endl;
         
 
 	do{
 		gettimeofday(&UTCtime_e,NULL);
+		
+		printf("%d",(int)(UTCtime_e.tv_sec - UTCtime_s.tv_sec));
 
                 cap.read(img_color);
                 if (img_color.empty()) {
@@ -253,11 +258,13 @@ void makeFile(char *path, char *file_name){
                 writer.write(img_color);
 
                 imshow("Color", img_color);
-                if (waitKey(30) >= 0)
-                        break;
+                if (waitKey(10) >= 0){
+                	FLAG=1;
+			break;
+		}
+	}while(disp_runtime(UTCtime_s, UTCtime_e)<(STEP-1));
 
-	}while(disp_runtime(UTCtime_s, UTCtime_e)<STEP);
-
+	writer.release();
         printf("[%s] 파일 만들었음!\n",p);
 }
 
