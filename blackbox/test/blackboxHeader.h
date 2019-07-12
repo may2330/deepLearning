@@ -54,8 +54,5 @@ namespace patch
 
 // 전역변수 정의
 extern int FLAG, T_FLAG;
-// extern string pipeline;
-// extern Mat img_color;
-// extern VideoCapture cap; 
 
 #endif

@@ -16,10 +16,9 @@ int disp_runtime(struct timeval UTCtime_s, struct timeval UTCtime_e)
 	return (int)UTCtime_r.tv_sec;
 }
 
-
 void *makeThread_f(void *data){
 	char dir_name[SIZE], path[SIZE], file_name[SIZE];
-        int result, check_del,gap;
+    int result,gap;
     struct timeval UTCtime_s, UTCtime_e;
 
     // 프로그램 시작시작
@@ -28,13 +27,13 @@ void *makeThread_f(void *data){
     while(!FLAG){
 
         // 런타임 구하기
-        // gettimeofday(&UTCtime_e, NULL);
-        // gap = disp_runtime(UTCtime_s, UTCtime_e) % STEP;
-        // printf(" %d",gap);
+        gettimeofday(&UTCtime_e, NULL);
+        gap = disp_runtime(UTCtime_s, UTCtime_e) % STEP;
+        printf("gap :  %d\n",gap);
 
         // 1분마다 실행
-        if(T_FLAG){
-            T_FLAG = 0;
+        if(!T_FLAG){
+            T_FLAG = 1;
             makeTime(0,dir_name);
             result = makeDir(dir_name,path);
             if(result==-1){
@@ -178,7 +177,7 @@ void makeFile(char *path, char *file_name){
 	}while(disp_runtime(UTCtime_s, UTCtime_e)<STEP);
 
 	writer.release();
-	T_FLAG = 1;
+	T_FLAG = 0;
         sleep(1);
 	printf("[%s] 파일 만들었음!\n",p);
 }
