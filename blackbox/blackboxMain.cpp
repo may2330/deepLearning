@@ -33,10 +33,11 @@ int main(void){
     if(pthread_create(&d_th, NULL, delThread_f, (void *)0))
 	    printf("Thread Error : No Make \n");
 
+    printf("시간 : ");
     while(!FLAG){
         gettimeofday(&UTCtime_e, NULL);
         gap = disp_runtime(UTCtime_s, UTCtime_e) % STEP;
-	    printf(" gap : %d\n",gap);
+	    printf(" %d",gap);
 	    if(gap==0){
             while(T_FLAG==0)
                     continue;	
@@ -46,6 +47,7 @@ int main(void){
             pthread_detach(m_th1);
 	    }
 	    sleep(1);
+        printf("\n시간 : ");
     }
     // thread detach 
     pthread_detach(d_th);

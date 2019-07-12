@@ -170,9 +170,9 @@ void makeTime(int time_flag,char *name){
     t = localtime(&timer); // 초 단위의 시간을 분리하여 구조체에 넣기
 
     if(time_flag)
-        strftime(file_name,20,"%Y%m%d_%H%M%S",t);
+        strftime(name,20,"%Y%m%d_%H%M%S",t);
     else
-        strftime(dir_name,20,"%Y%m%d_%H",t);
+        strftime(name,20,"%Y%m%d_%H",t);
 }
 
 int makeDir(char *name, char *path){
