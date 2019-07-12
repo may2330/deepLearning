@@ -2,16 +2,16 @@
 
 int disp_runtime(struct timeval UTCtime_s, struct timeval UTCtime_e)
 {
-        struct timeval UTCtime_r;
-        if((UTCtime_e.tv_usec- UTCtime_s.tv_usec)<0)
-                UTCtime_r.tv_sec  = UTCtime_e.tv_sec - UTCtime_s.tv_sec - 1;
-        else
-                UTCtime_r.tv_sec = UTCtime_e.tv_sec - UTCtime_s.tv_sec;
+    struct timeval UTCtime_r;
+    if((UTCtime_e.tv_usec- UTCtime_s.tv_usec)<0)
+            UTCtime_r.tv_sec  = UTCtime_e.tv_sec - UTCtime_s.tv_sec - 1;
+    else
+            UTCtime_r.tv_sec = UTCtime_e.tv_sec - UTCtime_s.tv_sec;
 	return (int)UTCtime_r.tv_sec;
 }
 
 
-void *m_function(void *data){
+void *makeThread_f(void *data){
         char *thread_name = (char *)data;
 	char dir_name[SIZE], path[SIZE], file_name[SIZE];
         int result, check_del;
@@ -30,7 +30,7 @@ void *m_function(void *data){
 	printf("\n\n");
 }
 
-void *d_function(void *data){
+void *delThread_f(void *data){
 	int check_del;
 	
 	while(1){
@@ -94,7 +94,6 @@ void delFirstDir(){
 
 int checkSize(){
     struct statfs fs;
-    size_t diskSize=0, freeSize=0;
     int result=0;
     float percent;
 
@@ -102,15 +101,12 @@ int checkSize(){
         printf("%s 파일 사이즈 없음! 헐....\n",PATH);
         exit(0);
     }
-    
-    diskSize = fs.f_blocks * (fs.f_bsize/1024); // printf 에서 %lu
-    freeSize = fs.f_bfree * (fs.f_bsize/1024);
 
-    percent = ((float)freeSize/diskSize)*100;
-    printf("    percent : %f \n",percent);
+    percent = ((float)fs.f_bfree/fs.f_blocks)*100; // printf 에서 %lu
+    printf("    percent : %f",percent);
 
     // 남은 용량이 30% 이하이면 삭제
-    if(percent > 30)
+    if(percent > 45)
         result = 1;
     
     return result;
@@ -142,7 +138,7 @@ void makeFile(char *path, char *file_name){
 	do{
 		gettimeofday(&UTCtime_e,NULL);
 		
-		printf("%d",(int)(UTCtime_e.tv_sec - UTCtime_s.tv_sec));
+		// printf("%d",(int)(UTCtime_e.tv_sec - UTCtime_s.tv_sec));
 
                 cap.read(img_color);
                 if (img_color.empty()) {

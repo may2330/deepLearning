@@ -34,8 +34,8 @@ void makeFile(char *path, char *file_name);
 int checkSize();
 void delFirstDir();
 void delDir(char *dir_name);
-void *d_function(void *data);
-void *m_function(void *data);
+void *delThread_f(void *data);
+void *makeThread_f(void *data);
 int disp_runtime(struct timeval UTCtime_s, struct timeval UTCtime_e);
 string get_tegra_pipeline(int width, int height, int fps);
 
