@@ -28,12 +28,13 @@ void *makeThread_f(void *data){
     while(!FLAG){
 
         // 런타임 구하기
-        gettimeofday(&UTCtime_e, NULL);
-        gap = disp_runtime(UTCtime_s, UTCtime_e) % STEP;
-        printf(" %d",gap);
+        // gettimeofday(&UTCtime_e, NULL);
+        // gap = disp_runtime(UTCtime_s, UTCtime_e) % STEP;
+        // printf(" %d",gap);
 
         // 1분마다 실행
-        if(gap==0){
+        if(T_FLAG){
+            T_FLAG = 0;
             makeTime(0,dir_name);
             result = makeDir(dir_name,path);
             if(result==-1){
