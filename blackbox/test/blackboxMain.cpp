@@ -8,13 +8,13 @@ int T_FLAG=0;
 
 int main(void){
     // 쓰레드 
-    pthread_t d_th, m_th1;
+    pthread_t d_th, m_th;
 
     // 쓰레드 생성
     if(pthread_create(&d_th, NULL, delThread_f, (void *)0))
 	    printf("Thread Error : No Make \n");
 
-    if(pthread_create(&m_th1, NULL, makeThread_f, (void *)0))
+    if(pthread_create(&m_th, NULL, makeThread_f, (void *)0))
         printf("M-Thread Error : No Make \n");
         
     while(!FLAG)

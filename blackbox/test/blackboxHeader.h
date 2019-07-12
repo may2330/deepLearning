@@ -32,7 +32,7 @@ using namespace std;
 void makePathDir();
 void makeTime(int time_flag, char *name);
 int makeDir(char *name, char *path);
-void makeFile(char *path, char *file_name);
+void makeFile(char *path, char *file_name, VideoCapture *cap);
 int checkSize();
 void delFirstDir();
 void delDir(char *dir_name);

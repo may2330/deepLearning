@@ -1,11 +1,5 @@
 #include "blackboxHeader.h"
 
-// Define the gstream pipeline
-std::string pipeline = get_tegra_pipeline(WIDTH, HEIGHT, FPS);
-
-//비디오 캡쳐 초기화
-VideoCapture cap(pipeline, CAP_GSTREAMER);
-
 int disp_runtime(struct timeval UTCtime_s, struct timeval UTCtime_e)
 {
     struct timeval UTCtime_r;
@@ -24,6 +18,12 @@ void *makeThread_f(void *data){
     // 프로그램 시작시작
     gettimeofday(&UTCtime_s, NULL);
 
+    // Define the gstream pipeline
+    std::string pipeline = get_tegra_pipeline(WIDTH, HEIGHT, FPS);
+
+    //비디오 캡쳐 초기화
+    VideoCapture cap(pipeline, CAP_GSTREAMER);
+
     while(!FLAG){
         // 1분마다 실행
         if(!T_FLAG){
@@ -35,7 +35,7 @@ void *makeThread_f(void *data){
                 exit(0);
             }
             makeTime(1,file_name);
-            makeFile(path,file_name);
+            makeFile(path,file_name, &cap);
             
             printf("\n");
         }
@@ -125,7 +125,7 @@ int checkSize(){
     return result;
 }
 
-void makeFile(char *path, char *file_name){
+void makeFile(char *path, char *file_name, VideoCapture *cap){
 	char p[SIZE];
 	struct timeval UTCtime_s, UTCtime_e;
     Mat img_color;
@@ -139,8 +139,8 @@ void makeFile(char *path, char *file_name){
 	strcat(p,".avi");
 
         // 동영상 파일을 저장하기 위한 준비  
-        Size size = Size((int)cap.get(CAP_PROP_FRAME_WIDTH),
-                (int)cap.get(CAP_PROP_FRAME_HEIGHT));
+        Size size = Size((int)cap->get(CAP_PROP_FRAME_WIDTH),
+                (int)cap->get(CAP_PROP_FRAME_HEIGHT));
 
         VideoWriter writer;
         writer.open(p, VideoWriter::fourcc('D', 'I', 'V', 'X'), FPS, size, true);
@@ -151,7 +151,7 @@ void makeFile(char *path, char *file_name){
 	do{
 		gettimeofday(&UTCtime_e,NULL);
 		
-                cap.read(img_color);
+                cap->read(img_color);
                 if (img_color.empty()) {
                         cerr << "빈 영상이 캡쳐되었습니다.\n";
                         break;
