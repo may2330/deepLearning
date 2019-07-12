@@ -46,6 +46,9 @@ using namespace std;
 // 시스템 종료
 int FLAG=0;
 
+// Thread 의 상태 (실행중/종료)
+int T_FLAG=1;
+
 // camera
 int WIDTH = 720;
 int HEIGHT = 480;
@@ -82,9 +85,12 @@ int main(void){
             gettimeofday(&UTCtime_e, NULL);
             gap = disp_runtime(UTCtime_s, UTCtime_e) % STEP;
 	    printf(" gap : %d\n",gap);
-	    if(gap==0 && flag==0){
+	    if(gap==0){
 //		flag = 1;
-	    	if(pthread_create(&m_th1, NULL, m_function, (void *)p1))
+		while(T_FLAG==0)
+	    		continue;	
+		T_FLAG = 0;
+		if(pthread_create(&m_th1, NULL, m_function, (void *)p1))
 			printf("M-Thread Error : No Make \n");
 	        pthread_detach(m_th1);
 	    }
@@ -245,8 +251,6 @@ void makeFile(char *path, char *file_name){
 
 	do{
 		gettimeofday(&UTCtime_e,NULL);
-		
-		printf("%d",(int)(UTCtime_e.tv_sec - UTCtime_s.tv_sec));
 
                 cap.read(img_color);
                 if (img_color.empty()) {
@@ -262,10 +266,12 @@ void makeFile(char *path, char *file_name){
                 	FLAG=1;
 			break;
 		}
-	}while(disp_runtime(UTCtime_s, UTCtime_e)<(STEP-1));
+	}while(disp_runtime(UTCtime_s, UTCtime_e)<STEP);
 
 	writer.release();
-        printf("[%s] 파일 만들었음!\n",p);
+	T_FLAG = 1;
+        sleep(1);
+	printf("[%s] 파일 만들었음!\n",p);
 }
 
 void makeTimeFile(char *file_name){
