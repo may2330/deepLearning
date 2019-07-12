@@ -17,14 +17,14 @@ void *makeThread_f(void *data){
         int result, check_del;
 
 	printf("\n\n\n[%s]====================\n",thread_name);
-	makeTimeDir(dir_name);
+	makeTime(0,dir_name);
 	result = makeDir(dir_name,path);
 	if(result==-1){
 		printf("디렉토리 안만들어졌다!!!!!!!!!!!!!!1\n");
 		exit(0);
 	}
 
-	makeTimeFile(file_name);
+	makeTime(1,file_name);
 	makeFile(path,file_name);
 	
 	printf("\n\n");
@@ -162,24 +162,17 @@ void makeFile(char *path, char *file_name){
 	printf("[%s] 파일 만들었음!\n",p);
 }
 
-void makeTimeFile(char *file_name){
+void makeTime(int time_flag,char *name){
     time_t timer;  // 시간측정
     struct tm *t;
 
     timer = time(NULL); // 현재 시각을 초 단위로 얻기
     t = localtime(&timer); // 초 단위의 시간을 분리하여 구조체에 넣기
 
-    strftime(file_name,20,"%Y%m%d_%H%M%S",t);
-}
-
-void makeTimeDir(char *dir_name){
-    time_t timer;  // 시간측정
-    struct tm *t;
-
-    timer = time(NULL); // 현재 시각을 초 단위로 얻기
-    t = localtime(&timer); // 초 단위의 시간을 분리하여 구조체에 넣기
-
-    strftime(dir_name,20,"%Y%m%d_%H",t);
+    if(time_flag)
+        strftime(file_name,20,"%Y%m%d_%H%M%S",t);
+    else
+        strftime(dir_name,20,"%Y%m%d_%H",t);
 }
 
 int makeDir(char *name, char *path){

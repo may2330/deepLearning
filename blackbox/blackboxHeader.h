@@ -27,9 +27,8 @@ using namespace std;
 
 // 함수 정의
 void makePathDir();
-void makeTimeDir(char *name);
+void makeTime(int time_flag, char *name);
 int makeDir(char *name, char *path);
-void makeTimeFile(char *file_name);
 void makeFile(char *path, char *file_name);
 int checkSize();
 void delFirstDir();
