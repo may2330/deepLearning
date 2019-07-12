@@ -25,12 +25,6 @@ void *makeThread_f(void *data){
     gettimeofday(&UTCtime_s, NULL);
 
     while(!FLAG){
-
-        // 런타임 구하기
-        gettimeofday(&UTCtime_e, NULL);
-        gap = disp_runtime(UTCtime_s, UTCtime_e) % STEP;
-        printf("gap :  %d\n",gap);
-
         // 1분마다 실행
         if(!T_FLAG){
             T_FLAG = 1;
@@ -45,7 +39,7 @@ void *makeThread_f(void *data){
             
             printf("\n");
         }
-        sleep(1);
+        // sleep(1);
     }
 }
 
@@ -149,7 +143,6 @@ void makeFile(char *path, char *file_name){
                 (int)cap.get(CAP_PROP_FRAME_HEIGHT));
 
         VideoWriter writer;
-        // double fps = 30.0;
         writer.open(p, VideoWriter::fourcc('D', 'I', 'V', 'X'), FPS, size, true);
         if (!writer.isOpened())
                 cout << "동영상을 저장하기 위한 초기화 작업 중 에러 발생" << endl;
@@ -158,8 +151,6 @@ void makeFile(char *path, char *file_name){
 	do{
 		gettimeofday(&UTCtime_e,NULL);
 		
-		// printf("%d",(int)(UTCtime_e.tv_sec - UTCtime_s.tv_sec));
-
                 cap.read(img_color);
                 if (img_color.empty()) {
                         cerr << "빈 영상이 캡쳐되었습니다.\n";
@@ -178,7 +169,6 @@ void makeFile(char *path, char *file_name){
 
 	writer.release();
 	T_FLAG = 0;
-        sleep(1);
 	printf("[%s] 파일 만들었음!\n",p);
 }
 
